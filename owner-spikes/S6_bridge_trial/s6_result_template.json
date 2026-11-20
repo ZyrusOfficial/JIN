@@ -1,0 +1,34 @@
+{
+  "spike": "S6",
+  "name": "mautrix-meta bridge trial (spare account)",
+  "timestamp": "2026-11-20T00:00:00+08:00",
+  "account_type": "spare_only",
+  "bridge_version": "v0.2611.0",
+  "hardware": "",
+  "login_method": "device | cookie",
+  "trial_start_date": "",
+  "trial_end_date": "",
+  "events": [
+    {
+      "day": 1,
+      "date": "",
+      "connected": true,
+      "checkpoint": false,
+      "forced_password_change": false,
+      "relogin_required": false,
+      "messages_working": true,
+      "notes": ""
+    }
+  ],
+  "summary": {
+    "total_checkpoints": 0,
+    "total_forced_password_changes": 0,
+    "total_relogins_required": 0,
+    "longest_uninterrupted_days": 0,
+    "messages_sent_successfully": 0,
+    "messages_received_successfully": 0,
+    "recommend_bridge": false
+  },
+  "error": null,
+  "notes": "Replace with actual spike results after ~1 week trial"
+}

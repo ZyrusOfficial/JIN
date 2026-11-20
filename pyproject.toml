@@ -1,0 +1,76 @@
+[project]
+name = "jarvis"
+version = "0.1.0"
+description = "JARVIS: proactive voice-first desktop assistant"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.10,<3",
+    "pydantic-settings>=2.6,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.11",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.26",
+    "hypothesis>=6.120",
+    "pytest-mock>=3.14",
+    "mutmut>=3.8",
+]
+
+[project.scripts]
+jarvis = "jarvis.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "Q", "UP", "B", "C4", "DTZ", "PLR", "PERF", "RET", "RUF", "TRY"]
+fixable = ["F", "I", "N", "Q", "UP", "B", "C4", "PLR", "PERF", "RET", "RUF", "TRY"]
+unfixable = []
+
+[tool.ruff.lint.per-file-ignores]
+"src/python/tests/*" = [
+    "S101",      # assert in tests
+    "PLR2004",   # magic values in tests
+    "PLR6301",   # noqa in tests
+    "N806",      # lowercase variable names in tests
+    "F841",      # unused variables in tests
+    "RUF059",    # unpacked variables in tests
+    "B905",      # zip without strict in tests
+    "PLR0913",   # too many args in test functions
+    "PLR0917",   # positional args in tests
+    "E501",      # line too long in tests
+    "TRY003",    # long messages in tests
+]
+"src/python/jarvis/skeleton.py" = ["PLR2004", "TRY300"]
+"src/python/jarvis/domain/__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["jarvis"]
+
+[tool.mypy]
+strict = true
+python_version = 3.12
+warn_return_any = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["src/python/tests"]
+markers = [
+    "contract",
+    "logic",
+    "property",
+    "security",
+    "simulation",
+    "mutation",
+]

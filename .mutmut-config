@@ -1,0 +1,10 @@
+[mutmut]
+paths = src/python/jarvis/domain
+tests_dir = src/python/tests
+runner = pytest
+python_version = 3.11
+# Mutate the safety-critical domain code
+exclude_lines = [
+    "pragma: no mutate",
+    "raise NotImplementedError",
+]

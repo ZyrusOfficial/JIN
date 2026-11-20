@@ -1,0 +1,23 @@
+{
+  "spike": "S1",
+  "name": "Windows notification listener",
+  "timestamp": "2026-11-20T00:00:00+08:00",
+  "access_granted": true,
+  "unpackaged_app": true,
+  "toast_enabled": true,
+  "method": "PowerShell probe or C# WinRT app",
+  "notifications": [
+    {
+      "id": "notif-1",
+      "app_id": "Facebook.Messenger",
+      "title": "Ana",
+      "text": "Hey, are you free later?",
+      "timestamp": "2026-11-20T09:15:00+08:00",
+      "has_actions": true,
+      "raw_fields": {}
+    }
+  ],
+  "messenger_seen": false,
+  "error": null,
+  "notes": "Replace with actual spike results"
+}

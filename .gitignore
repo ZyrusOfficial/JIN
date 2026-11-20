@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+env.rc
+.venv
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+.cache
+
+# Linting/Formatting
+.ruff_cache/
+.mypy_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# JARVIS specific
+*.log
+jarvis-data/
+credentials/
+secrets/
+*.key
+*.pem
+
+# Spike results (owner-specific, don't commit real data)
+owner-spikes/*/s*_result.json
+!owner-spikes/*/s*_result_template.json

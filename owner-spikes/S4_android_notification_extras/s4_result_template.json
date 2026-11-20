@@ -1,0 +1,42 @@
+{
+  "spike": "S4",
+  "name": "Android Messenger notification extras",
+  "timestamp": "2026-11-20T00:00:00+08:00",
+  "device_model": "",
+  "android_version": "",
+  "messenger_version": "",
+  "findings": {
+    "extra_messages_present": false,
+    "extra_historic_messages_present": false,
+    "sender_field_populated": false,
+    "text_field_populated": false,
+    "timestamp_field_populated": false,
+    "data_uri_for_media": false,
+    "group_conversation_flag": false,
+    "reply_action_present": false,
+    "mark_as_read_action_present": false
+  },
+  "message_types_tested": [
+    {
+      "type": "short text",
+      "extras_complete": false,
+      "truncated": false
+    },
+    {
+      "type": "long message",
+      "extras_complete": false,
+      "truncated": false
+    },
+    {
+      "type": "image",
+      "extras_complete": false,
+      "data_uri_present": false
+    },
+    {
+      "type": "group chat",
+      "is_group_flag": false,
+      "sender_per_message": false
+    }
+  ],
+  "notes": "Replace with actual spike results"
+}
