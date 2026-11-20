@@ -1,0 +1,18 @@
+{
+  "spike": "S3",
+  "name": "Taglish STT",
+  "timestamp": "2026-11-20T00:00:00+08:00",
+  "engine": "faster-whisper",
+  "model": "base",
+  "device": "cpu",
+  "results": [
+    {
+      "prompt_id": "en-01",
+      "reference": "Hello, what time is it?",
+      "hypothesis": "Hello, what time is it?",
+      "wer": 0.0
+    }
+  ],
+  "average_wer": 0.0,
+  "error": null
+}

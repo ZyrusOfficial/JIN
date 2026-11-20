@@ -1,0 +1,31 @@
+{
+  "spike": "S5",
+  "name": "Phone Link Messenger mirroring",
+  "timestamp": "2026-11-20T00:00:00+08:00",
+  "windows_version": "",
+  "phone_model": "",
+  "android_version": "",
+  "phone_link_version": "",
+  "findings": {
+    "messenger_notifications_appear": false,
+    "sender_visible": false,
+    "text_visible": false,
+    "timestamp_visible": false,
+    "reply_from_windows_works": false,
+    "dismiss_syncs_bidirectional": false,
+    "fidelity_notes": ""
+  },
+  "test_messages": [
+    {
+      "type": "short text",
+      "appeared_on_pc": false,
+      "content_visible": false
+    },
+    {
+      "type": "long message",
+      "appeared_on_pc": false,
+      "truncated": false
+    }
+  ],
+  "notes": "Replace with actual spike results"
+}

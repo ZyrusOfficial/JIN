@@ -1,0 +1,15 @@
+{
+  "spike": "S2",
+  "name": "Audio loop",
+  "timestamp": "2026-11-20T00:00:00+08:00",
+  "sample_rate": 16000,
+  "chunk_size": 1024,
+  "channels": 1,
+  "vad_speech_detected": true,
+  "vad_silence_detected": true,
+  "round_trip_latency_ms": 150.0,
+  "echo_detected_speakers": true,
+  "echo_detected_headphones": false,
+  "devices": [],
+  "error": null
+}

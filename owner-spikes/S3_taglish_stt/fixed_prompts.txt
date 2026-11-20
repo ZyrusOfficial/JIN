@@ -1,0 +1,9 @@
+# Fixed prompts for Taglish STT testing (Spike S3)
+# Record yourself reading each prompt. Save each as a separate WAV file
+# named matching the prompt ID (e.g., en-01.wav, fil-01.wav, taglish-01.wav).
+
+en-01: Hello, what time is it?
+fil-01: Kumusta ka? Ano ang plano mo ngayon?
+taglish-01: Hey Jarvis, paano po ako papasok sa meeting bukas?
+taglish-02: Can you remind me about my appointment sa mga alas-dose?
+taglish-03: Magandang umaga po. Ano ang balita ngayon?
