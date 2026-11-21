@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0b">
+    <title>JARVIS — Animation Showcase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Demo-specific overlays */
+        .demo-banner {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: linear-gradient(90deg, var(--accent) 0%, #33f8ff 100%);
+            color: var(--text-inverse);
+            padding: 0.5rem 1.5rem;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            z-index: 9999;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(0, 243, 255, 0.3);
+        }
+        .demo-state-badge {
+            position: fixed;
+            top: 72px;
+            right: 1.5rem;
+            background: var(--surface-2);
+            border: 1px solid var(--border-accent);
+            color: var(--accent);
+            padding: 0.5rem 0.875rem;
+            border-radius: 2rem;
+            font-family: "Orbitron", "Inter", sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            z-index: 9998;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(12px);
+        }
+        .demo-legend {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(10, 10, 11, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 1rem;
+            padding: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            z-index: 9997;
+            box-shadow: var(--shadow-lg);
+        }
+        .demo-legend h3 {
+            color: var(--accent);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            font-family: "Orbitron", "Inter", sans-serif;
+        }
+        .demo-legend ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.375rem; }
+        .demo-legend li { display: flex; align-items: center; gap: 0.5rem; }
+        .demo-legend .dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--surface-3); border: 1px solid var(--border-subtle);
+            flex-shrink: 0;
+        }
+        .demo-controls {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 9998;
+            display: flex;
+            gap: 0.5rem;
+            background: var(--surface-1);
+            border: 1px solid var(--border-subtle);
+            border-radius: 1rem;
+            padding: 0.5rem;
+            box-shadow: var(--shadow-lg);
+        }
+        .demo-btn {
+            padding: 0.5rem 0.75rem;
+            background: var(--surface-2);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--dur-base) var(--ease-out);
+        }
+        .demo-btn:hover { background: var(--surface-3); border-color: var(--border-accent); color: var(--accent); }
+        .demo-btn.active { background: var(--accent); color: var(--text-inverse); border-color: var(--accent); }
+        body { overflow-x: hidden; }
+    </style>
+</head>
+<body data-ui-state="idle" data-prefers-reduced-motion="false">
+
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <div class="demo-banner">JARVIS Glassmorphism 2.0 — Animation Showcase (auto-cycling all 6 states)</div>
+
+    <!-- ============ TOP BAR ============ -->
+    <header class="top-bar" role="banner">
+        <div class="container">
+            <div class="brand">
+                <div class="brand-mark" aria-label="JARVIS brand mark">
+                    <div class="orb orb--brand"></div>
+                </div>
+                <div class="brand-text">
+                    <h1>J<span class="accent">A</span>R<span class="accent">V</span>IS</h1>
+                    <span class="brand-subtitle">Voice-First Assistant</span>
+                </div>
+            </div>
+
+            <div class="top-center" id="top-center">
+                <div class="status-pill status--idle" id="status-pill">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Standby</span>
+                </div>
+            </div>
+
+            <div class="top-controls">
+                <div class="mic-indicator" id="mic-indicator" role="region" aria-label="Microphone status" aria-live="polite">
+                    <button class="mic-btn" id="mic-btn" type="button" aria-pressed="false" data-state="off">
+                        <span class="mic-icon" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        </span>
+                        <span class="mic-label">Mic: Off</span>
+                        <span class="mic-pulse" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <button class="kill-switch" id="kill-switch" type="button" aria-pressed="false" data-state="inactive">
+                    <span class="ks-icon" aria-hidden="true">⏹</span>
+                    <span class="ks-label">Kill Switch</span>
+                    <span class="ks-state">Inactive</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="demo-state-badge" id="demo-badge">IDLE</div>
+
+    <!-- ============ MAIN ============ -->
+    <main id="main" class="main" role="main">
+        <div class="container">
+
+            <!-- Conversation / Response Area -->
+            <section class="conversation-panel" aria-label="Conversation">
+                <div class="panel-header">
+                    <h2>Conversation</h2>
+                    <span class="panel-subtitle">Voice interaction log</span>
+                </div>
+                <div class="conversation-log" id="conversation-log" aria-live="polite">
+                    <div class="msg msg--system">
+                        <div class="msg-avatar msg-avatar--system">J</div>
+                        <div class="msg-content">
+                            <div class="msg-text">JARVIS initialized. All systems nominal. Awaiting wake word.</div>
+                            <div class="msg-time" id="msg-time-0"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                    <div class="typing-bubble">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                    <span class="typing-label">JARVIS is thinking</span>
+                </div>
+            </section>
+
+            <!-- Proactive Alerts (Bento Grid) -->
+            <section class="alerts-panel" aria-label="Proactive Alerts">
+                <div class="panel-header">
+                    <h2>Proactive Alerts</h2>
+                    <span class="panel-subtitle">Calendar · News · Messages · System</span>
+                </div>
+                <div class="bento-grid" id="bento-grid">
+                    <div class="bento-placeholder">
+                        <div class="placeholder-icon">∅</div>
+                        <p>No active alerts</p>
+                        <p class="placeholder-hint">Alerts appear here proactively</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ============ RIGHT SIDEBAR ============ -->
+    <aside class="sidebar" role="complementary" aria-label="System controls">
+        <div class="sidebar-inner">
+
+            <div class="widget kill-widget">
+                <div class="widget-header">
+                    <h3>Global Kill Switch</h3>
+                    <span class="widget-sub">Stops all speech, listening, proactive behavior</span>
+                </div>
+                <button class="kill-switch-big" id="kill-switch-big" type="button" data-state="inactive">
+                    <span class="ks-big-icon">𛭀</span>
+                    <span class="ks-big-text">KILL SWITCH</span>
+                    <span class="ks-big-sub">INACTIVE</span>
+                </button>
+                <div class="kill-status-indicator" id="kill-status-indicator">
+                    <span class="dot dot--safe"></span>
+                    <span class="text">All systems operational</span>
+                </div>
+            </div>
+
+            <div class="widget mic-widget">
+                <div class="widget-header">
+                    <h3>Microphone</h3>
+                    <span class="widget-sub">Privacy by default</span>
+                </div>
+                <div class="mic-status-display" id="mic-status-display">
+                    <div class="mic-dot mic-dot--off"></div>
+                    <span class="mic-text">Off</span>
+                </div>
+                <div class="mic-level-meter" id="mic-level-meter">
+                    <div class="meter-bar"></div><div class="meter-bar"></div><div class="meter-bar"></div><div class="meter-bar"></div><div class="meter-bar"></div>
+                </div>
+            </div>
+
+            <div class="widget health-widget">
+                <div class="widget-header">
+                    <h3>System Health</h3>
+                    <span class="widget-sub">Real-time diagnostics</span>
+                </div>
+                <div class="health-grid">
+                    <div class="health-item"><span class="label">STT</span><span class="value status--ok">Ready</span></div>
+                    <div class="health-item"><span class="label">TTS</span><span class="value status--ok">Ready</span></div>
+                    <div class="health-item"><span class="label">Wake Word</span><span class="value status--ok">Active</span></div>
+                    <div class="health-item"><span class="label">Policy Gate</span><span class="value status--ok">T0-T3</span></div>
+                </div>
+            </div>
+
+            <div class="widget audit-widget">
+                <div class="widget-header">
+                    <h3>Audit Trail</h3>
+                    <span class="widget-sub">Tamper-evident log with 'why'</span>
+                </div>
+                <div class="audit-entries" id="audit-entries">
+                    <div class="audit-entry">
+                        <span class="audit-time">02:13:45</span>
+                        <span class="audit-action">system.init</span>
+                        <span class="audit-reason">JARVIS initialized — all domains loaded</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- ============ ALERT POPUP (Overlay) ============ -->
+    <div class="popup-overlay" id="popup-overlay" role="dialog" aria-modal="true" aria-label="Proactive alert" style="display: none;">
+        <div class="popup-card" id="popup-card">
+            <div class="popup-header">
+                <span class="popup-level popup-level--L3" id="popup-level">L3 Critical</span>
+                <button class="popup-close" id="popup-close" type="button" aria-label="Dismiss alert">✕</button>
+            </div>
+            <h2 class="popup-title" id="popup-title">Alert Title</h2>
+            <p class="popup-body" id="popup-body">Alert body text goes here.</p>
+            <div class="popup-source" id="popup-source">Source: system · now</div>
+            <div class="popup-actions">
+                <button class="popup-btn popup-btn--primary" id="popup-btn-read" type="button">Read Aloud</button>
+                <button class="popup-btn popup-btn--secondary" id="popup-btn-snooze" type="button">Snooze 30m</button>
+                <button class="popup-btn popup-btn--tertiary" id="popup-btn-dismiss" type="button">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ TOAST NOTIFICATIONS ============ -->
+    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- ============ INPUT FALLBACK ============ -->
+    <div class="input-bar" id="input-bar">
+        <div class="container">
+            <input type="text" id="text-input" placeholder="Type a message to JARVIS..." aria-label="Text input fallback">
+            <button class="input-send" id="input-send" type="button">Send</button>
+        </div>
+    </div>
+
+    <div class="demo-legend">
+        <h3>Animation Showcase Sequence</h3>
+        <ul id="demo-legend-list">
+            <li><span class="dot"></span>Idle → Listening (mic pulse + status dot blink)</li>
+            <li><span class="dot"></span>Thinking (typing indicator bounce)</li>
+            <li><span class="dot"></span>Speaking (status glow + message slide-in)</li>
+            <li><span class="dot"></span>Alert (L3 popup enters with spring)</li>
+            <li><span class="dot"></span>Bento cards (L1/L2/L3 staggered entrance)</li>
+            <li><span class="dot"></span>Toasts (slide-in from right)</li>
+            <li><span class="dot"></span>Kill switch (danger pulse + mic disabled)</li>
+        </ul>
+    </div>
+
+    <div class="demo-controls">
+        <button class="demo-btn" id="demo-pause" type="button">Pause</button>
+        <button class="demo-btn" id="demo-reset" type="button">Reset</button>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        /* --------------------------------------------------------------
+           Demo Sequencer — auto-cycles through all UI states
+           Uses the real JARVIS_UI API (setUiState, addMessage, addAlert,
+           toast, toggleMic, toggleKill, showPopup, hidePopup)
+           -------------------------------------------------------------- */
+        (function(){
+            const badge = document.getElementById('demo-badge');
+            const legendItems = document.querySelectorAll('#demo-legend-list li .dot');
+            const pauseBtn = document.getElementById('demo-pause');
+            const resetBtn = document.getElementById('demo-reset');
+            let paused = false;
+            let running = true;
+
+            pauseBtn.addEventListener('click', () => {
+                paused = !paused;
+                pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+                pauseBtn.classList.toggle('active', !paused);
+            });
+            resetBtn.addEventListener('click', () => location.reload());
+
+            function setBadge(state, color) {
+                badge.textContent = state;
+                badge.style.background = color || 'var(--surface-2)';
+                badge.style.color = color && color.includes('danger') ? 'var(--danger)' : 'var(--accent)';
+            }
+
+            function highlightLegend(idx) {
+                legendItems.forEach((d, i) => {
+                    d.style.background = i === idx ? 'var(--accent)' : 'var(--surface-3)';
+                    d.style.boxShadow = i === idx ? '0 0 8px var(--accent-glow)' : '';
+                });
+            }
+
+            function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+            async function run() {
+                const UI = window.JARVIS_UI;
+
+                // 1. IDLE (start)
+                setBadge('IDLE', 'var(--surface-2)');
+                highlightLegend(0);
+                await sleep(2000);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+
+                // 2. LISTENING — mic on + status blink
+                UI.toggleMic();
+                UI.setUiState('listening');
+                setBadge('LISTENING', 'var(--accent)');
+                highlightLegend(1);
+                await sleep(2500);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+
+                // 3. THINKING — typing indicator
+                UI.setTyping(true);
+                UI.addMessage('user', 'Hey Jarvis, what is the status of my calendar today?', { audit: true });
+                UI.setUiState('thinking');
+                setBadge('THINKING', 'var(--surface-3)');
+                highlightLegend(2);
+                await sleep(2000);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+
+                // 4. SPEAKING — assistant reply
+                UI.setTyping(false);
+                UI.setUiState('speaking');
+                UI.addMessage('jarvis', "You have two events today: team sync at 10:00 in Conference Room B, and a 1:1 with your manager at 14:30.", { audit: true });
+                setBadge('SPEAKING', 'var(--success)');
+                highlightLegend(2);
+                await sleep(3000);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+
+                // 5. ALERTS — bento cards appear (staggered)
+                UI.setUiState('alert');
+                setBadge('ALERT', 'var(--l3)');
+                highlightLegend(3);
+                UI.addAlert({ id: 'demo-1', level: 'L2', title: 'Calendar reminder', body: 'Team sync in 10 minutes — Conference Room B.', source: 'calendar' });
+                await sleep(1200);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+                UI.addAlert({ id: 'demo-2', level: 'L3', title: 'Security update available', body: 'Critical OS update detected. Install now?', source: 'update-guardian' });
+                await sleep(1200);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+                UI.addAlert({ id: 'demo-3', level: 'L1', title: 'News briefing ready', body: 'AI regulation bill passes committee review.', source: 'news' });
+                await sleep(2000);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+
+                // 6. POPUP — open the L3 alert
+                UI.showPopup({ id: 'demo-2', level: 'L3', title: 'Security update available', body: 'Critical OS update detected. Install now?', source: 'update-guardian', time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
+                highlightLegend(3);
+                await sleep(2500);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+                UI.hidePopup();
+                UI.dismissAlert('demo-2');
+                await sleep(800);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+
+                // 7. TOASTS
+                UI.toast('Calendar sync completed successfully.', 'success', 4000);
+                UI.toast('Mic level nominal.', 'info', 3000);
+                highlightLegend(4);
+                await sleep(2500);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+
+                // 8. KILL SWITCH — activates
+                UI.toggleKill();
+                setBadge('KILL-ACTIVE', 'var(--danger)');
+                highlightLegend(6);
+                await sleep(3000);
+                if (paused) await new Promise(r => { const check = () => { if (!paused) r(); else setTimeout(check, 100); }; check(); });
+
+                // 9. Return to IDLE
+                UI.toggleKill();
+                UI.setUiState('idle');
+                setBadge('IDLE', 'var(--surface-2)');
+                UI.toast('All systems nominal. Standing by.', 'success', 3000);
+                running = false;
+            }
+
+            run().catch(() => {});
+        })();
+    </script>
+</body>
+</html>

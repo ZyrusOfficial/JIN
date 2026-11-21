@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0b">
+    <title>JARVIS — Voice-First Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <noscript><p>JavaScript is required for JARVIS to function.</p></noscript>
+</head>
+<body data-ui-state="idle" data-prefers-reduced-motion="false">
+    <!-- Accessibility: Skip to content -->
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <!-- Audio context for beep/buzzer feedback (Web Audio API) -->
+    <script src="app.js"></script>
+
+    <!-- ============ TOP BAR ============ -->
+    <header class="top-bar" role="banner">
+        <div class="container">
+            <div class="brand">
+                <div class="brand-mark" aria-label="JARVIS brand mark">
+                    <div class="orb orb--brand"></div>
+                </div>
+                <div class="brand-text">
+                    <h1>J<span class="accent">A</span>R<span class="accent">V</span>IS</h1>
+                    <span class="brand-subtitle">Voice-First Assistant</span>
+                </div>
+            </div>
+
+            <div class="top-center" id="top-center">
+                <div class="status-pill status--idle" id="status-pill">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Standby</span>
+                </div>
+            </div>
+
+            <div class="top-controls">
+                <div class="mic-indicator" id="mic-indicator" role="region" aria-label="Microphone status" aria-live="polite">
+                    <button class="mic-btn" id="mic-btn" type="button" aria-pressed="false" data-state="off">
+                        <span class="mic-icon" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        </span>
+                        <span class="mic-label">Mic: Off</span>
+                        <span class="mic-pulse" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                <button class="kill-switch" id="kill-switch" type="button" aria-pressed="false" data-state="inactive">
+                    <span class="ks-icon" aria-hidden="true">⏹</span>
+                    <span class="ks-label">Kill Switch</span>
+                    <span class="ks-state">Inactive</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============ MAIN ============ -->
+    <main id="main" class="main" role="main">
+        <div class="container">
+
+            <!-- Conversation / Response Area -->
+            <section class="conversation-panel" aria-label="Conversation">
+                <div class="panel-header">
+                    <h2>Conversation</h2>
+                    <span class="panel-subtitle">Voice interaction log</span>
+                </div>
+
+                <div class="conversation-log" id="conversation-log" aria-live="polite">
+                    <!-- Messages injected here -->
+                    <div class="msg msg--system">
+                        <div class="msg-avatar msg-avatar--system">J</div>
+                        <div class="msg-content">
+                            <div class="msg-text">JARVIS initialized. All systems nominal. Awaiting wake word.</div>
+                            <div class="msg-time" id="msg-time-0"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing indicator (shown when "thinking") -->
+                <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                    <div class="typing-bubble">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                    <span class="typing-label">JARVIS is thinking</span>
+                </div>
+            </section>
+
+            <!-- Proactive Alerts (Bento Grid) -->
+            <section class="alerts-panel" aria-label="Proactive Alerts">
+                <div class="panel-header">
+                    <h2>Proactive Alerts</h2>
+                    <span class="panel-subtitle">Calendar · News · Messages · System</span>
+                </div>
+
+                <div class="bento-grid" id="bento-grid">
+                    <!-- Alert cards injected here -->
+                    <div class="bento-placeholder">
+                        <div class="placeholder-icon">∅</div>
+                        <p>No active alerts</p>
+                        <p class="placeholder-hint">Alerts appear here proactively</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ============ RIGHT SIDEBAR (Desktop) ============ -->
+    <aside class="sidebar" role="complementary" aria-label="System controls">
+        <div class="sidebar-inner">
+
+            <!-- Kill Switch (prominent) -->
+            <div class="widget kill-widget">
+                <div class="widget-header">
+                    <h3>Global Kill Switch</h3>
+                    <span class="widget-sub">Stops all speech, listening, proactive behavior</span>
+                </div>
+                <button class="kill-switch-big" id="kill-switch-big" type="button" data-state="inactive">
+                    <span class="ks-big-icon">𛭀</span>
+                    <span class="ks-big-text">KILL SWITCH</span>
+                    <span class="ks-big-sub">INACTIVE</span>
+                </button>
+                <div class="kill-status-indicator" id="kill-status-indicator">
+                    <span class="dot dot--safe"></span>
+                    <span class="text">All systems operational</span>
+                </div>
+            </div>
+
+            <!-- Mic Status -->
+            <div class="widget mic-widget">
+                <div class="widget-header">
+                    <h3>Microphone</h3>
+                    <span class="widget-sub">Privacy by default</span>
+                </div>
+                <div class="mic-status-display" id="mic-status-display">
+                    <div class="mic-dot mic-dot--off"></div>
+                    <span class="mic-text">Off</span>
+                </div>
+                <div class="mic-level-meter" id="mic-level-meter">
+                    <div class="meter-bar"></div><div class="meter-bar"></div><div class="meter-bar"></div><div class="meter-bar"></div><div class="meter-bar"></div>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="widget health-widget">
+                <div class="widget-header">
+                    <h3>System Health</h3>
+                    <span class="widget-sub">Real-time diagnostics</span>
+                </div>
+                <div class="health-grid">
+                    <div class="health-item">
+                        <span class="label">STT</span>
+                        <span class="value status--ok">Ready</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="label">TTS</span>
+                        <span class="value status--ok">Ready</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="label">Wake Word</span>
+                        <span class="value status--ok">Active</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="label">Policy Gate</span>
+                        <span class="value status--ok">T0-T3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Log (Recent "Why" entries) -->
+            <div class="widget audit-widget">
+                <div class="widget-header">
+                    <h3>Audit Trail</h3>
+                    <span class="widget-sub">Tamper-evident log with 'why'</span>
+                </div>
+                <div class="audit-entries" id="audit-entries">
+                    <div class="audit-entry">
+                        <span class="audit-time">02:13:45</span>
+                        <span class="audit-action">system.init</span>
+                        <span class="audit-reason">JARVIS initialized — all domains loaded</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- ============ ALERT POPUP (Overlay) ============ -->
+    <div class="popup-overlay" id="popup-overlay" role="dialog" aria-modal="true" aria-label="Proactive alert" style="display: none;">
+        <div class="popup-card" id="popup-card">
+            <div class="popup-header">
+                <span class="popup-level popup-level--L3" id="popup-level">L3 Critical</span>
+                <button class="popup-close" id="popup-close" type="button" aria-label="Dismiss alert">✕</button>
+            </div>
+            <h2 class="popup-title" id="popup-title">Alert Title</h2>
+            <p class="popup-body" id="popup-body">Alert body text goes here.</p>
+            <div class="popup-source" id="popup-source">Source: news · official</div>
+            <div class="popup-actions">
+                <button class="popup-btn popup-btn--primary" id="popup-btn-read" type="button">Read Aloud</button>
+                <button class="popup-btn popup-btn--secondary" id="popup-btn-snooze" type="button">Snooze 30m</button>
+                <button class="popup-btn popup-btn--tertiary" id="popup-btn-dismiss" type="button">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ TOAST NOTIFICATIONS ============ -->
+    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- ============ INPUT FALLBACK (Desktop) ============ -->
+    <div class="input-bar" id="input-bar">
+        <div class="container">
+            <input type="text" id="text-input" placeholder="Type a message to JARVIS..." aria-label="Text input fallback">
+            <button class="input-send" id="input-send" type="button">Send</button>
+        </div>
+    </div>
+
+</body>
+</html>
