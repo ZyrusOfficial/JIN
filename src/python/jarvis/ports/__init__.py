@@ -10,6 +10,7 @@ from jarvis.ports.message_source import MessageSource
 from jarvis.ports.news_source import NewsSource
 from jarvis.ports.notification_source import NotificationSource
 from jarvis.ports.policy_gate import GateDecision, PolicyGate, TrustTier
+from jarvis.ports.popup import PopupCard, PopupPort
 from jarvis.ports.secrets_broker import SecretsBroker
 from jarvis.ports.stt import SpeechToText
 from jarvis.ports.tts import TextToSpeech
@@ -28,6 +29,8 @@ __all__ = [
     "NewsSource",
     "NotificationSource",
     "PolicyGate",
+    "PopupCard",
+    "PopupPort",
     "SecretsBroker",
     "SpeechToText",
     "TextToSpeech",
