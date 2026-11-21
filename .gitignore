@@ -53,3 +53,5 @@ owner-spikes/*/s*_result.json
 !owner-spikes/*/s*_result_template.json
 .venv_ui/
 capture_ui.py
+.venv_ui/
+capture_ui*.py
