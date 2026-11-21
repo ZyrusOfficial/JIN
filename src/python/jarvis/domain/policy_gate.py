@@ -9,34 +9,15 @@ This is the production implementation (FakePolicyGate remains for tests).
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
+from jarvis.domain.approval.models import ApprovalRecord as DomainApprovalRecord
+from jarvis.domain.approval.models import StandingRule as DomainStandingRule
 from jarvis.ports.policy_gate import GateDecision, GateResult, TrustTier
 
-
-@dataclass(frozen=True)
-class StandingRule:
-    """A narrow standing rule that auto-approves a specific action type."""
-
-    rule_id: str
-    action_prefix: str  # e.g. "send_message" matches all send_message actions
-    tier: TrustTier
-    scope: str  # e.g. "contact:Ana" or "calendar:work"
-    expires_at: datetime | None = None
-    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
-
-
-@dataclass
-class ApprovalRecord:
-    """A recorded approval for a specific action."""
-
-    action_id: str
-    approver: str
-    scope: str
-    tier: TrustTier
-    expires_at: datetime | None
-    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+# Re-export for backward compatibility with tests
+StandingRule = DomainStandingRule
+ApprovalRecord = DomainApprovalRecord
 
 
 class PolicyGate:
@@ -68,9 +49,7 @@ class PolicyGate:
     def list_standing_rules(self) -> list[StandingRule]:
         """Return all active (non-expired) standing rules."""
         now = datetime.now(UTC)
-        return [
-            r for r in self._standing_rules.values() if r.expires_at is None or r.expires_at > now
-        ]
+        return [r for r in self._standing_rules.values() if r.matches("dummy", "T0", now)]
 
     # -- Approvals ------------------------------------------------------------
 
@@ -87,22 +66,27 @@ class PolicyGate:
             action_id=action_id,
             approver=approver,
             scope=scope,
-            tier=tier,
+            tier=tier.value,
             expires_at=expires_at,
         )
 
     def revoke_approval(self, action_id: str) -> bool:
-        """Revoke an approval. Returns True if it existed."""
-        return self._approvals.pop(action_id, None) is not None
+        """Revoke an approval. Returns True if it existed and was revoked.
+
+        After revocation, the record is removed so subsequent calls return False
+        and is_approved returns False.
+        """
+        record = self._approvals.pop(action_id, None)
+        if record is None:
+            return False
+        return True
 
     def is_approved(self, action_id: str) -> bool:
         """Check whether an action has a current, non-expired approval."""
         record = self._approvals.get(action_id)
         if record is None:
             return False
-        if record.expires_at is not None and record.expires_at <= datetime.now(UTC):
-            return False
-        return True
+        return record.is_valid()
 
     # -- Evaluation -----------------------------------------------------------
 
@@ -130,11 +114,7 @@ class PolicyGate:
             rule = self._standing_rules.get(rule_id)
             if rule is None:
                 continue
-            if rule.expires_at is not None and rule.expires_at <= now:
-                continue
-            if not action.startswith(rule.action_prefix):
-                continue
-            if rule.tier.value < tier.value:  # rule tier must be >= action tier
+            if not rule.matches(action, tier.value, now):
                 continue
             standing_rule_id = rule_id
             break
@@ -193,9 +173,7 @@ class PolicyGate:
         standing_rule_id: str | None,
     ) -> str:
         if standing_rule_id:
-            return (
-                f"{decision.value}: {action} (tier {tier.value}, standing rule {standing_rule_id})"
-            )
+            return f"{decision.value}: {action} (tier {tier.value}, rule {standing_rule_id})"
         return f"{decision.value}: {action} (tier {tier.value})"
 
     # -- Inspection -----------------------------------------------------------
